@@ -1,0 +1,20 @@
+{
+  "fiscal": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "dp": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "contabil": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  }
+}
