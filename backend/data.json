@@ -1,13 +1,18 @@
 {
   "fiscal": {
     "blocks": [
-      {}
+      {
+        "title": "",
+        "content": ""
+      }
     ],
     "completed": false
   },
   "dp": {
     "blocks": [
-      {}
+      {
+        "content": ""
+      }
     ],
     "completed": false
   },

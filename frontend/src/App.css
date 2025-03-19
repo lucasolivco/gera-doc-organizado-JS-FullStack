@@ -1,38 +1,234 @@
-.App {
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+/* Variáveis para o modo claro */
+:root {
+  --background-color: #f4f7fd;
+  --text-color: #000000;
+  --card-background: #f8f9fa;
+  --card-border: #ddd;
+  --button-background: #007bff;
+  --button-hover: #0056b3;
+  --input-background: #ffffff;
+  --input-border: #ddd;
+  --input-text-color: #000000;
+  --card-header-background: #f8f9fa;
+  --card-header-text-color: #333;
+  --card-completed-background: #bbd3c2;
+  --placeholder-color: #807b7b;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Variáveis para o modo escuro */
+.dark-mode {
+  --background-color: #232327; /* Fundo escuro */
+  --text-color: #ffffff; /* Texto branco */
+  --card-background: #2d2d2d; /* Fundo cinza escuro para cards */
+  --card-border: #444; /* Borda cinza escura */
+  --button-background: #3d3c3c; /* Botão cinza escuro */
+  --button-hover: #555; /* Botão cinza mais claro no hover */
+  --input-background: #444; /* Fundo cinza para inputs */
+  --input-border: #555; /* Borda cinza para inputs */
+  --input-text-color: #ffffff; /* Texto branco para inputs */
+  --card-header-background: #2d2d2d; /* Fundo cinza escuro para o header do card */
+  --card-header-text-color: #ffffff; /* Texto branco para o header do card */
+  --card-completed-background: #333;
+  --placeholder-color: #ada6a6;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Estilos globais */
+/* Aplicar o background-color ao body */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.custom-input {
+  color: var(--input-text-color) !important; /* Força a cor a ser branca, mesmo que outras regras tentem sobrescrever */
+}
+
+
+/* Estilo para o placeholder no Dark Mode */
+.custom-input::placeholder {
+  color: var(--placeholder-color);
+}
+
+/* Estilo para o título do formulário */
+.form-title {
+  font-family: 'Montserrat', sans-serif; /* Fonte moderna */
+  font-size: 2rem; /* Tamanho grande */
+  font-weight: 600; /* Peso da fonte (negrito) */
+  color: var(--text-color); /* Cor do texto (ajusta automaticamente ao tema) */
+  text-align: center; /* Centralizado */
+  margin-bottom: 1.5rem; /* Espaçamento abaixo do título */
+  letter-spacing: -0.05em; /* Espaçamento entre letras sutil */
+  position: relative; /* Para adicionar um sublinhado */
+}
+
+/* Efeito de sublinhado sutil */
+.form-title::after {
+  content: '';
+  display: block;
+  width: 60px; /* Largura do sublinhado */
+  height: 3px; /* Espessura do sublinhado */
+  background-color: #007bff; /* Cor do sublinhado (azul) */
+  margin: 0.5rem auto 0; /* Centraliza o sublinhado */
+  transition: width 0.3s ease; /* Animação suave */
+}
+
+/* Efeito de hover no sublinhado */
+.form-title:hover::after {
+  width: 100px; /* Aumenta a largura ao passar o mouse */
+}
+
+/* Botão de alternância */
+.dark-mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  z-index: 1000;
+}
+
+/* Estilo para o Card */
+.custom-card {
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  margin-bottom: 20px;
+  background-color: var(--card-background);
+}
+
+/* Estilo para o Card Header */
+.custom-card .card-header {
+  background-color: var(--card-header-background);
+  border-bottom: 1px solid var(--card-border);
+  border-radius: 10px 10px 0 0;
+  padding: 15px;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+.custom-card .card-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--card-header-text-color);
+}
+
+/* Estilo para os Botões */
+.custom-button {
+  border-radius: 25px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-button:hover {
+  transform: scale(1.05);
+}
+
+.custom-button:active {
+  transform: scale(0.95);
+}
+
+/* Botão Adicionar Bloco */
+.btn-primary.custom-button {
+  background-color: #4837e7;
+  border: none;
+}
+
+.btn-primary.custom-button:hover {
+  background-color: #3e2fc7;
+}
+
+/* Botão Editar Seção */
+.btn-warning.custom-button {
+  background-color: #eec23d;
+  border: none;
+}
+
+.btn-warning.custom-button:hover {
+  background-color: #ca9e18;
+}
+
+/* Botão Excluir Bloco */
+.btn-danger.custom-button {
+  background-color: #d33948;
+  border: none;
+}
+
+.btn-danger.custom-button:hover {
+  background-color: #9b2b36;
+}
+
+/* Botão Finalizar Seção */
+.btn-outline-success.custom-button {
+  border-color: #28a745;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-outline-success.custom-button:hover {
+  background-color: #28a745;
+  color: white;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Estilo para os Inputs e Textareas */
+.custom-input {
+  border-radius: 5px;
+  border: 1px solid var(--input-border);
+  padding: 10px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--input-background);
+  color: var(--input-text-color);
 }
+
+.custom-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  outline: none;
+  background-color: var(--input-background);
+}
+
+.dark-mode .custom-input:disabled {
+  background-color: var(--input-background);
+  color: var(--input-text-color);
+  opacity: 1; /* Importante: remove o efeito 'apagado' */
+}
+
+/* Estilo para as Rows e Cols */
+.custom-row {
+  margin-bottom: 15px;
+}
+
+.custom-col {
+  padding: 0 10px;
+}
+
+/* Estilo para seções concluídas */
+.custom-card.completed {
+  border-color: #28a745;
+}
+
+/* Estilo para o modal no modo escuro */
+.dark-mode .modal-content {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+.dark-mode .modal-header {
+  border-bottom: 1px solid #444;
+}
+
+.dark-mode .modal-footer {
+  border-top: 1px solid #444;
+}
+
+.dark-mode .close {
+  color: #ffffff;
+}
+
+
