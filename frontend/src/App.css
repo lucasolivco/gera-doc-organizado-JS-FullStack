@@ -3,11 +3,14 @@
 /* Variáveis para o modo claro */
 :root {
   --background-color: #f4f7fd;
+  --header-background: #f8f9fa; /* Fundo do cabeçalho */
+  --header-text-color: #333; /* Cor do texto do cabeçalho */
+  --header-border-color: #ddd; /* Cor da borda do cabeçalho */
   --text-color: #000000;
   --card-background: #f8f9fa;
   --card-border: #ddd;
-  --button-background: #007bff;
-  --button-hover: #0056b3;
+  --button-background: #4837e7;
+  --button-hover: #3e2fc7;
   --input-background: #ffffff;
   --input-border: #ddd;
   --input-text-color: #000000;
@@ -20,11 +23,14 @@
 /* Variáveis para o modo escuro */
 .dark-mode {
   --background-color: #232327; /* Fundo escuro */
+  --header-background: #2d2d2d; /* Fundo do cabeçalho */
+  --header-text-color: #ffffff; /* Cor do texto do cabeçalho */
+  --header-border-color: #444; /* Cor da borda do cabeçalho */
   --text-color: #ffffff; /* Texto branco */
   --card-background: #2d2d2d; /* Fundo cinza escuro para cards */
   --card-border: #444; /* Borda cinza escura */
-  --button-background: #3d3c3c; /* Botão cinza escuro */
-  --button-hover: #555; /* Botão cinza mais claro no hover */
+  --button-background: #4837e7; /* Botão cinza escuro */
+  --button-hover: #3e2fc7; /* Botão cinza mais claro no hover */
   --input-background: #444; /* Fundo cinza para inputs */
   --input-border: #555; /* Borda cinza para inputs */
   --input-text-color: #ffffff; /* Texto branco para inputs */
@@ -32,6 +38,28 @@
   --card-header-text-color: #ffffff; /* Texto branco para o header do card */
   --card-completed-background: #333;
   --placeholder-color: #ada6a6;
+}
+
+/* Estilo para o cabeçalho */
+.header {
+  background-color: var(--card-background); /* Usa a cor de fundo do card */
+  color: var(--text-color); /* Usa a cor do texto do tema */
+  border: 1px solid var(--card-border); /* Usa a cor da borda do card */
+  border-radius: 10px; /* Borda arredondada */
+  padding: 20px; /* Espaçamento interno */
+  margin-bottom: 20px; /* Espaçamento abaixo do cabeçalho */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Transição suave */
+}
+
+.header p {
+  margin: 5px 0; /* Espaçamento entre parágrafos */
+  font-size: 1rem; /* Tamanho da fonte */
+  color: var(--text-color); /* Usa a cor do texto do tema */
+}
+
+.header strong {
+  font-weight: 600; /* Texto em negrito */
 }
 
 /* Estilos globais */
@@ -70,15 +98,15 @@ body {
   display: block;
   width: 60px; /* Largura do sublinhado */
   height: 3px; /* Espessura do sublinhado */
-  background-color: #007bff; /* Cor do sublinhado (azul) */
+  background-color: #4f2ceb; /* Cor do sublinhado (azul) */
   margin: 0.5rem auto 0; /* Centraliza o sublinhado */
   transition: width 0.3s ease; /* Animação suave */
 }
 
-/* Efeito de hover no sublinhado */
+/* Efeito de hover no sublinhado 
 .form-title:hover::after {
-  width: 100px; /* Aumenta a largura ao passar o mouse */
-}
+  width: 100px; /* Aumenta a largura ao passar o mouse 
+}*/
 
 /* Botão de alternância */
 .dark-mode-toggle {
@@ -231,4 +259,115 @@ body {
   color: #ffffff;
 }
 
+.custom-row .fa-times {
+  color: #dc3545;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.custom-row .fa-times:hover {
+  color: #c82333;
+}
+
+/* Estilos para o ReactQuill no modo escuro */
+.dark-mode .ql-toolbar {
+  background-color: var(--card-background);
+  border-color: var(--card-border) !important;
+}
+
+.dark-mode .ql-container {
+  background-color: var(--input-background);
+  border-color: var(--card-border) !important;
+}
+
+.dark-mode .ql-editor {
+  color: var(--input-text-color);
+  background-color: var(--input-background);
+}
+
+.dark-mode .ql-snow .ql-stroke {
+  stroke: var(--input-text-color);
+}
+
+.dark-mode .ql-snow .ql-fill {
+  fill: var(--input-text-color);
+}
+
+.dark-mode .ql-snow .ql-picker {
+  color: var(--input-text-color);
+}
+
+.dark-mode .ql-snow .ql-picker-options {
+  background-color: var(--card-background);
+  border-color: var(--card-border);
+}
+
+.dark-mode .ql-snow .ql-picker-item {
+  color: var(--input-text-color);
+}
+
+.dark-mode .ql-snow .ql-picker-label {
+  color: var(--input-text-color);
+}
+
+.spinner-border {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 0.2em;
+  vertical-align: middle;
+}
+
+/* Estilos para a lista de formulários */
+.form-list-item {
+  background-color: var(--card-background) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-color) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px !important;
+  padding: 16px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-list-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--button-hover) !important;
+}
+
+.form-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: var(--button-background);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.form-list-item:hover::before {
+  opacity: 1;
+}
+
+.form-list-item span {
+  font-weight: 600;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+/* Ajustes para o botão na lista */
+.form-list-item .btn {
+  color: var(--text-color) !important;
+  border: 1px solid var(--button-background) !important;
+  background-color: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+.form-list-item .btn:hover {
+  background-color: var(--button-background) !important;
+  color: white !important;
+}
 
