@@ -360,15 +360,26 @@ body {
 
 /* Ajustes para o botão na lista */
 .form-list-item .btn {
-  color: var(--text-color) !important;
-  border: 1px solid var(--button-background) !important;
-  background-color: transparent !important;
-  transition: all 0.3s ease !important;
+  color: var(--text-color);
+  border: 1px solid var(--button-background);
+  background-color: transparent;
+  transition: all 0.3s ease;
 }
 
 .form-list-item .btn:hover {
-  background-color: var(--button-background) !important;
+  background-color: var(--button-background);
+  color: white;
+}
+
+.delete-form-btn {
+  border-color: red !important;
+  color: red !important;
+}
+
+.delete-form-btn:hover {
+  background-color: red !important;
   color: white !important;
+  border-color: red !important;
 }
 
 /* Botão de voltar */
@@ -408,5 +419,13 @@ body {
   height: 18px;
 }
 
+/* No seu arquivo App.css */
+.ql-editor ul, .ql-editor ol {
+  padding-left: 2em;
+}
+
+.ql-editor li:not(.ql-direction-rtl) {
+  padding-left: 1.5em;
+}
 
 

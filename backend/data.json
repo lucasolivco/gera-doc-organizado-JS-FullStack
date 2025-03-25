@@ -1,32 +1,36 @@
 {
-  "97bb4f6d-070d-4b10-a2ae-182be2b46c72": {
+  "abc9269e-bbf8-4210-8258-204b09d012e3": {
     "fiscal": {
       "blocks": [
-        {}
-      ],
-      "completed": false
-    },
-    "dp": {
-      "blocks": [
         {
-          "content": "<p>111111111111111111111</p>"
+          "title": "Pauta 1 - Documentação",
+          "content": "<ul><li><strong>Documentação: </strong>Desenvolver documentação completa de cada <em>sessão da aplicação</em> e o que for necessário.</li><li>A documentação será dividida em três categorias principais:</li><li class=\"ql-indent-1\"><strong>Documentação Técnica</strong>: Detalhes sobre arquitetura, tecnologias, APIs e banco de dados.</li><li class=\"ql-indent-1\"><strong>Documentação de Segurança e Processos</strong>: Procedimentos de segurança e controle de acessos.</li><li class=\"ql-indent-1\"><strong>Documentação do Usuário</strong>: Guia de uso e funcionalidades do sistema.</li><li class=\"ql-align-justify\"><strong>Documentação Técnica</strong></li><li class=\"ql-align-justify ql-indent-1\">Arquitetura do Sistema</li><li class=\"ql-align-justify ql-indent-1\">Banco de Dados</li><li class=\"ql-align-justify ql-indent-1\">APIs e Requisições</li><li class=\"ql-align-justify ql-indent-1\">Login e Autenticação</li><li class=\"ql-align-justify\"><strong>Documentação do Usuário</strong></li><li class=\"ql-align-justify ql-indent-1\">Cadastro e Login</li><li class=\"ql-align-justify ql-indent-1\">Interface e Navegação</li><li class=\"ql-align-justify ql-indent-1\">Funcionalidades Disponíveis</li><li class=\"ql-align-justify\"><strong>Documentação de Segurança e Processos</strong></li><li class=\"ql-align-justify ql-indent-1\">Segurança do Sistema</li><li class=\"ql-align-justify ql-indent-1\">Controle de Acessos</li><li class=\"ql-align-justify ql-indent-1\">Procedimentos de Manutenção</li></ul>"
         },
         {
-          "content": "<p>1111111111</p>"
+          "content": "<ul><li><strong>Testes de Funcionalidade: </strong><em>Testes unitários e de integração</em> para validar cada funcionalidade. Simular uso por diferentes tipos de usuários, correção de bugs e melhorias antes da implantação.</li><li><strong>Testes de Segurança: </strong>Validar vulnerabilidades contra SQL Injection e XSS, realizar testes de autenticação e controle de acesso. Além de, avaliar criptografia e armazenamento seguro de senhas.</li><li><strong>Testes de Usabilidade:</strong> Realizar avaliação com usuários finais para verificar a experiência com a aplicação. Ajustes na interface e fluxos conforme feedbacks coletados.</li><li><strong>Coleta de Feedbacks:</strong> Enviar formulários de avaliação para os usuários e implementar melhorias com base nos feedbacks recebidos. <em>Também é necessário a análise de métricas de uso e identificação de pontos de melhoria.</em></li></ul>",
+          "title": "Pauta 2 - Testes e FeedBacks"
         }
       ],
-      "completed": false
+      "completed": true
+    },
+    "dp": {
+      "blocks": [],
+      "completed": true
     },
     "contabil": {
       "blocks": [
         {
-          "content": "<p>1</p>"
+          "content": "<p>Foi realizada a análise dos resultados financeiros do último trimestre, destacando os seguintes pontos principais:</p><p><br></p><p>1. Receita total apresentou um crescimento de 15% em relação ao trimestre anterior.</p><ul><li><strong>Lorem Ipsum</strong>&nbsp;is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</li><li>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</li></ul><p>&nbsp;</p><p>2. As despesas operacionais permaneceram dentro do orçamento estipulado.</p><ul><li><u>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</u></li></ul><p><br></p><p>3. O lucro líquido foi impactado positivamente pelos novos contratos firmados com empresas parceiras.</p><ul><li><s>It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</s></li></ul><p><br></p><p>4. Necessidade de revisão das projeções financeiras para o próximo semestre.</p><p>Deliberação:</p><p>Será agendada uma reunião específica no início do próximo mês para revisar o<strong> planejamento financeiro estratégico da empresa.</strong></p>"
         }
       ],
-      "completed": false
+      "completed": true
     },
     "headerData": {
-      "empresa": "framengo"
+      "participantesContabilidade": "Eli, Cataryna e William",
+      "data": "2025-03-25",
+      "empresa": "REDBULL (exemplo)",
+      "participantesEmpresa": "Max Verstappen",
+      "local": "Canella & Santos, Volta Redonda-RJ"
     }
   }
 }

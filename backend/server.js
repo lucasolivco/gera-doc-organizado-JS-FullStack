@@ -49,17 +49,6 @@ const saveFormData = (formId, formData) => {
   fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 };
 
-// function para remover formulário (DELETE)
-const deleteFormData = (formId) => {
-  let data = readAllData();
-  if (data[formId]) {
-    delete data[formId];
-    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-    return true;
-  }
-  return false;
-};
-
 // function para gerar PDF
 const generatePDF = (sections, headerData, filename) => {
     console.log('Gerando PDF...');
@@ -87,6 +76,12 @@ const generatePDF = (sections, headerData, filename) => {
         }
       });
     });
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}-${month}-${year}`;
   };
 
 // function para gerar HTML a partir das seções
@@ -226,6 +221,40 @@ const generateHTML = (sections, headerData) => {
             font-size: 10pt;
             color: #666;
           }
+
+          /* Novos estilos para listas hierárquicas */         
+          .block-content li {
+            position: relative;
+            margin-bottom: 0.2cm;
+          }
+          
+          /* Estilos para diferentes níveis de identação */
+          .block-content ul ul,
+          .block-content ol ol {
+            padding-left: 1cm;
+          }
+          
+          .block-content .ql-indent-1 { margin-left: 1.5cm; }
+          .block-content .ql-indent-2 { margin-left: 3.0cm; }
+          .block-content .ql-indent-3 { margin-left: 4.5cm; }
+          .block-content .ql-indent-4 { margin-left: 6.0cm; }
+          
+          /* Estilos para listas ordenadas */
+          .block-content ol {
+            list-style-type: decimal;
+          }
+          
+          .block-content ol .ql-indent-1 {
+            list-style-type: lower-alpha;
+          }
+          
+          .block-content ol .ql-indent-2 {
+            list-style-type: lower-roman;
+          }
+          
+          .block-content ol .ql-indent-3 {
+            list-style-type: upper-alpha;
+          }
         </style>
       </head>
       <body>
@@ -243,7 +272,7 @@ const generateHTML = (sections, headerData) => {
               </tr>
               <tr>
                 <td>Data</td>
-                <td>${headerData.data || ''}</td>
+                <td>${headerData.data ? formatDate(headerData.data) : ''}</td>
               </tr>
               <tr>
                 <td>Representantes ${headerData.empresa || ''}</td>
@@ -255,30 +284,50 @@ const generateHTML = (sections, headerData) => {
           </div>
     `;
 
-    // adiciona as seções ao HTML
+    // Função para processar o conteúdo HTML do Quill
+    const processQuillContent = (content) => {
+      if (!content) return '';
+      
+      // Converte classes de identação para estilos consistentes
+      content = content
+        .replace(/<li class="ql-indent-(\d+)"/g, '<li class="ql-indent-$1" style="margin-left: ${1.5 * parseInt($1)}cm"')
+        .replace(/<ul class="ql-indent-(\d+)"/g, '<ul class="ql-indent-$1" style="margin-left: ${1.5 * parseInt($1)}cm"')
+        .replace(/<ol class="ql-indent-(\d+)"/g, '<ol class="ql-indent-$1" style="margin-left: ${1.5 * parseInt($1)}cm"');
+      
+      return content;
+    };
+
+    // Processa cada seção
     Object.entries(sections).forEach(([sectionName, section]) => {
-      // ignora se não for uma seção válida (fiscal, dp ou contabil)
-      if (!section.blocks || !Array.isArray(section.blocks)) return;
-    
-      html += `
-        <div class="section">
-          <div class="section-title">${sectionTitles[sectionName] || sectionName.toUpperCase()}</div>
-      `;
-      section.blocks.forEach((block) => {
-        if (block.title || block.content) {
-          html += `
-            <div class="block">
-              ${block.title ? `<div class="block-title">${block.title}</div>` : ''}
-              ${block.content ? `<div class="block-content">${block.content}</div>` : ''}
-            </div>
-          `;
-        }
-      });
-      html += `</div>`;
+    const blocks = section?.blocks || [];
+    const hasContent = blocks.some(block => {
+        const hasTitle = block?.title?.trim();
+        const hasContent = block?.content?.trim();
+        return hasTitle || hasContent;
     });
 
-    // seção de assinaturas (opcional, se necessário)
-    html += ` `;
+      if (hasContent) {
+        html += `
+          <div class="section">
+            <div class="section-title">${sectionTitles[sectionName] || sectionName.toUpperCase()}</div>
+        `;
+
+        section.blocks.forEach((block) => {
+          if (block.title || block.content) {
+            html += `
+              <div class="block">
+                ${block.title ? `<div class="block-title">${block.title}</div>` : ''}
+                ${block.content ? `<div class="block-content">${processQuillContent(block.content)}</div>` : ''}
+              </div>
+            `;
+          }
+        });
+
+        html += `</div>`;
+      }
+    });
+
+    html += `</div></body></html>`;
     return html;
 };
   
@@ -300,7 +349,8 @@ app.get('/forms', (req, res) => {
     const data = readAllData();
     const formsList = Object.keys(data).map(formId => ({
       id: formId,
-      title: data[formId].headerData?.empresa || 'Formulário sem título'
+      title: data[formId].headerData?.empresa || 'Formulário sem título',
+      date: data[formId].headerData?.data || 'Sem data'
     }));
     res.json(formsList);
   } catch (error) {
@@ -318,7 +368,9 @@ app.post('/createForm', (req, res) => {
       fiscal: { blocks: [{}], completed: false },
       dp: { blocks: [{}], completed: false },
       contabil: { blocks: [{}], completed: false },
-      headerData: {}
+      headerData: {
+        participantesContabilidade: 'Eli, Cataryna e William'
+      }
     };
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
     res.json({ formId: id });
@@ -381,8 +433,6 @@ app.post('/generate/:formId', async (req, res) => {
     // zip.addLocalFile(wordPath);
     zip.writeZip(zipPath);
     res.json({ filename: id });
-    // após a geração, remove o formulário
-    deleteFormData(formId);
   } catch (error) {
     console.error('Erro ao gerar documentos:', error);
     res.status(500).json({ error: 'Erro ao gerar documentos' });
@@ -426,6 +476,9 @@ app.delete('/form/:formId', (req, res) => {
 });
 
 // inicia o servidor na porta 3001
-app.listen(3001, () => {
-    console.log('Servidor rodando em http://localhost:3001');
+const PORT = process.env.PORT || 3001;
+const HOST = '0.0.0.0'; // Isso permite acesso de qualquer IP na rede
+
+app.listen(PORT, HOST, () => {
+  console.log(`Servidor rodando em http://${HOST}:${PORT}`);
 });

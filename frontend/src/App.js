@@ -7,54 +7,114 @@ import { FaSun, FaMoon, FaPlus, FaTrash, FaCheck, FaEdit, FaArrowLeft } from 're
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; //  estilos do editor
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const FormSelection = ({ onSelectForm}) => {
   const [forms,setForms] = useState([]);
+  const [showDeleteFormModal, setShowDeleteFormModal] = useState(false);
+  const [formToDelete, setFormToDelete] = useState(null);
 
-  useEffect(() => {
-    axios.get('http://localhost:3001/forms')
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  // Função para carregar formulários
+  const loadForms = () => {
+    axios.get(`${API_URL}/forms`)
       .then(response => {
         setForms(response.data);
       })
       .catch(error => {
         console.error('Erro ao carregar os formulários:', error);
       });
-  }
-  , []);
+  };
 
-  return (
-    <div>
-      <h2 className="form-title" style={{ marginBottom: '1.5rem' }}>Selecione um Formulário</h2>
-      <ListGroup className="mb-4">
-        {forms.map(form => (
-          <ListGroup.Item 
-            key={form.id}
-            className="form-list-item d-flex justify-content-between align-items-center"
-            style={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease' 
-            }}
-          >
-            <span className="ms-2" style={{ flexGrow: 1 }}>{form.title}</span>
-            <Button 
-              variant="outline-primary" 
-              onClick={() => onSelectForm(form.id)}
-              className="custom-button px-3 py-1"
+  useEffect(() => {
+    loadForms();
+  }, []);
+
+    // Função para deletar um formulário
+    const deleteForm = (formId) => {
+      axios.delete(`${API_URL}/form/${formId}`)
+        .then(() => {
+          // Após a exclusão, recarregue a lista de formulários
+          loadForms();
+        })
+        .catch(error => {
+          console.error('Erro ao deletar o formulário:', error);
+        });
+    };
+
+    return (
+      <div>
+        <h2 className="form-title" style={{ marginBottom: '1.5rem' }}>
+          Selecione um Formulário
+        </h2>
+        <ListGroup className="mb-4">
+          {forms.map(form => (
+            <ListGroup.Item 
+              key={form.id}
+              className="form-list-item d-flex justify-content-between align-items-center"
+              style={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
             >
-              Abrir
+              <span className="ms-2" style={{ flexGrow: 1 }}>
+                {form.title} {form.date && `- ${formatDate(form.date)}`}
+              </span>
+              <div>
+                <Button 
+                  variant="outline-primary" 
+                  onClick={() => onSelectForm(form.id)}
+                  className="custom-button px-3 py-1 me-2"
+                >
+                  Abrir
+                </Button>
+                <Button 
+                  variant="outline-danger" 
+                  onClick={() => {
+                    setFormToDelete(form.id);
+                    setShowDeleteFormModal(true);
+                  }}
+                  className="custom-button delete-form-btn px-3 py-1"
+                >
+                  <FaTrash />
+                </Button>
+              </div>
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+        <Button 
+          variant="success" 
+          onClick={() => onSelectForm('new')} 
+          className="custom-button d-block mx-auto px-4 py-2"
+        >
+          Criar Novo Formulário
+        </Button>
+
+         {/* Modal de Confirmação de Exclusão */}
+        <Modal show={showDeleteFormModal} onHide={() => setShowDeleteFormModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirmar Exclusão</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Tem certeza que deseja excluir este formulário?
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDeleteFormModal(false)}>
+              Cancelar
             </Button>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
-      <Button 
-        variant="success" 
-        onClick={() => onSelectForm('new')} 
-        className="custom-button d-block mx-auto px-4 py-2"
-      >
-        Criar Novo Formulário
-      </Button>
-    </div>
-  );
-};
+            <Button variant="danger" onClick={() => {
+              deleteForm(formToDelete);
+              setShowDeleteFormModal(false);
+            }}>
+              Excluir
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    );
+  };
 
 function App() {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
@@ -86,14 +146,14 @@ function App() {
     const newHeaderData = { ...headerData, [field]: value };
     setHeaderData(newHeaderData);
     if (formId) {
-      axios.post(`http://localhost:3001/update/${formId}`, { sections, headerData: newHeaderData });
+      axios.post(`${API_URL}/update/${formId}`, { sections, headerData: newHeaderData });
     }
   };
 
 // Carregar dados do formulário selecionado
 useEffect(() => {
   if (formId && formId !== 'new') {
-    axios.get(`http://localhost:3001/data/${formId}`)
+    axios.get(`${API_URL}/data/${formId}`)
       .then(response => {
         setSections(response.data);
         setHeaderData(response.data.headerData || headerData);
@@ -109,7 +169,7 @@ useEffect(() => {
       .finally(() => setLoading(false));
   } else if (formId === 'new') {
     // criar novo formulário e obter o formId
-    axios.post('http://localhost:3001/createForm')
+    axios.post(`${API_URL}/createForm`)
       .then(response => {
         setFormId(response.data.formId);
         // Inicializa com dados padrão
@@ -144,7 +204,7 @@ useEffect(() => {
     };
     setSections(updatedSections);
     if (formId) {
-      await axios.post(`http://localhost:3001/update/${formId}`, { sections: updatedSections, headerData });
+      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
     }
   };
 
@@ -156,7 +216,7 @@ useEffect(() => {
     };
     setSections(updatedSections);
     if (formId) {
-      await axios.post(`http://localhost:3001/update/${formId}`, { sections: updatedSections, headerData });
+      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
     }
   };
 
@@ -168,7 +228,7 @@ useEffect(() => {
     };
     setSections(updatedSections);
     if (formId) {
-      await axios.post(`http://localhost:3001/update/${formId}`, { sections: updatedSections, headerData });
+      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
     }
   };
 
@@ -180,7 +240,7 @@ useEffect(() => {
     };
     setSections(updatedSections);
     if (formId) {
-      await axios.post(`http://localhost:3001/update/${formId}`, { sections: updatedSections, headerData });
+      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
     }
   };
 
@@ -194,7 +254,7 @@ useEffect(() => {
     };
     setSections(updatedSections);
     if (formId) {
-      await axios.post(`http://localhost:3001/update/${formId}`, { sections: updatedSections, headerData });
+      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
     }
   };
 
@@ -220,8 +280,8 @@ useEffect(() => {
   const generateDocuments = async () => {
     try {
       setDownloadLoading(true);
-      const response = await axios.post(`http://localhost:3001/generate/${formId}`, { sections, headerData });
-      window.open(`http://localhost:3001/download/${response.data.filename}`, '_blank');
+      const response = await axios.post(`${API_URL}/generate/${formId}`, { sections, headerData });
+      window.open(`${API_URL}/download/${response.data.filename}`, '_blank');
       // await resetForm();
       // Opcional: após geração, redirecione para a tela de seleção
       setFormId(null);
@@ -407,7 +467,10 @@ useEffect(() => {
           <Modal.Title>Confirmar Geração</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          O documento será gerado e o formulário será apagado. Revise as informações caso necessário.
+          <p>Confirmar download do PDF?
+              <br></br> 
+              <br></br>
+          Caso tenha problemas com o download, desabilite o bloqueador de pop-ups.</p>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowGenerateModal(false)}>
@@ -429,8 +492,9 @@ const modules = {
   toolbar: [
     [{ 'header': [1, 2, 3, false] }],
     ['bold', 'italic', 'underline', 'strike'],
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'circle' }, { 'list': 'square' }],
     [{ 'indent': '-1' }, { 'indent': '+1' }],
+    [{ 'direction': 'rtl' }],
     [{ 'align': [] }],
     ['clean']
   ],
@@ -442,7 +506,9 @@ const modules = {
 const formats = [
   'header',
   'bold', 'italic', 'underline', 'strike',
-  'list', 'bullet', 'indent',
+  'list',
+  'indent',
+  'direction',
   'align',
 ];
 
