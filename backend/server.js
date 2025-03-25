@@ -3,9 +3,8 @@ const cors = require('cors');   // middleware cors para permitir requisições d
 const fs = require ('fs'); // módulo de sistema de arquivos
 const path = require('path'); // módulo de manipulação de caminhos de arquivos
 const { v4: uuidv4 } = require('uuid'); // Importa biblioteca para gerar IDs únicos
-const htmlToPdf = require('html-pdf');
-const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, Packer, BorderStyle } = require('docx');
-const AdmZip = require ('adm-zip');
+const htmlToPdf = require('html-pdf'); // Importa biblioteca para gerar PDF a partir de HTML
+const AdmZip = require ('adm-zip'); // Importa biblioteca para criar arquivos ZIP
 
 const app = express(); // cria uma instância do express
 app.use(cors()); // habilita o middleware cors
@@ -37,6 +36,12 @@ const readFormData = (formId) => {
   return data[formId];
 };
 
+const sectionTitles = {
+  fiscal: 'Departamento Fiscal',
+  dp: 'Departamento Pessoal',
+  contabil: 'Departamento Contábil'
+};
+
 // Função para salvar dados de um formulário específico
 const saveFormData = (formId, formData) => {
   let data = readAllData();
@@ -44,7 +49,7 @@ const saveFormData = (formId, formData) => {
   fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 };
 
-// Função para remover formulário (DELETE)
+// function para remover formulário (DELETE)
 const deleteFormData = (formId) => {
   let data = readAllData();
   if (data[formId]) {
@@ -58,8 +63,6 @@ const deleteFormData = (formId) => {
 // function para gerar PDF
 const generatePDF = (sections, headerData, filename) => {
     console.log('Gerando PDF...');
-    console.log('Header Data:', headerData);
-    console.log('Sections:', sections);
 
     const htmlContent = generateHTML(sections, headerData);
     
@@ -86,255 +89,7 @@ const generatePDF = (sections, headerData, filename) => {
     });
   };
 
-//   const convertHtmlToDocxElements = (html) => {
-//     if (!html) return [new Paragraph({})];
-  
-//     // Processar quebras de linha e parágrafos
-//     const cleanedHtml = html
-//       .replace(/&nbsp;/g, ' ') // Substitui espaços não quebráveis
-//       .replace(/<\/p>/g, '</p>\n') // Adiciona quebras após parágrafos
-//       .replace(/<br\s*\/?>/g, '\n'); // Converte <br> em quebras de linha
-  
-//     // Extrair texto limpo e dividir em linhas
-//     let text = cleanedHtml.replace(/<[^>]*>/g, ''); // Remove tags HTML
-  
-//     // Tratar espaçamentos extras
-//     text = text.replace(/\n{3,}/g, '\n\n'); // Limita quebras consecutivas a no máximo 2
-    
-//     const lines = text.split('\n').filter(line => line.trim() !== '');
-  
-//     // Converter linhas em elementos do Word
-//     const paragraphs = lines.map(line => {
-//       const trimmedLine = line.trim();
-      
-//       // Detectar listas numeradas (ex: "3.1.", "3.2.")
-//       const isNumberedList = /^\d+\.\d+\.?\s/.test(trimmedLine);
-//       const isBulletList = /^[•\-*]\s/.test(trimmedLine);
-      
-//       let processedLine = trimmedLine;
-//       let indent = {};
-      
-//       if (isNumberedList) {
-//         // Manter o número como parte do texto, mas adicionar indentação
-//         indent = { left: 720 };
-//       } else if (isBulletList) {
-//         // Remover o marcador de lista e adicionar indentação
-//         processedLine = trimmedLine.replace(/^[•\-*]\s/, '');
-//         indent = { left: 720 };
-//       }
-  
-//       // Verifica se parece ser um título
-//       const isTitle = trimmedLine.length < 50 && /^[A-Z0-9\s]+$/.test(trimmedLine);
-      
-//       return new Paragraph({
-//         children: [
-//           new TextRun({
-//             text: processedLine,
-//             bold: isTitle || isNumberedList, // Aplica negrito a títulos ou números de lista
-//           }),
-//         ],
-//         spacing: { after: 120 }, // Espaçamento entre parágrafos
-//         indent: indent,
-//         bullet: isBulletList ? { level: 0 } : undefined, // Adiciona bullet para listas com marcadores
-//       });
-//     });
-  
-//     return paragraphs;
-//   };
-
-// // function para gerar Word
-// const generateWord = async (sections, headerData, filename) => {
-//   console.log('Gerando Word...');
-  
-//   // Criar um array de seções para o documento
-//   const children = [];
-  
-//   // Adicionar título com formatação melhorada
-//   children.push(
-//     new Paragraph({
-//       text: "ATA DE REUNIÃO",
-//       heading: HeadingLevel.HEADING_1,
-//       alignment: AlignmentType.CENTER,
-//       spacing: { after: 400, before: 400 },
-//     })
-//   );
-
-//   // Linha horizontal após o título
-//   children.push(
-//     new Paragraph({
-//       text: "",
-//       border: {
-//         bottom: {
-//           color: "#000000",
-//           space: 1,
-//           style: BorderStyle.SINGLE,
-//           size: 6,
-//         },
-//       },
-//       spacing: { after: 400 },
-//     })
-//   );
-
-//   // Adicionar cabeçalho com tabela mais organizada
-//   children.push(
-//     new Paragraph({
-//       text: `Empresa: ${headerData.empresa}`,
-//       spacing: { after: 200 },
-//     })
-//   );
-  
-//   children.push(
-//     new Paragraph({
-//       text: `Local: ${headerData.local}`,
-//       spacing: { after: 200 },
-//     })
-//   );
-  
-//   children.push(
-//     new Paragraph({
-//       text: `Data: ${headerData.data}`,
-//       spacing: { after: 200 },
-//     })
-//   );
-  
-//   // Adicionar seção de participantes com melhor formatação
-//   children.push(
-//     new Paragraph({
-//       text: "PARTICIPANTES:",
-//       bold: true,
-//       spacing: { after: 200, before: 200 }
-//     })
-//   );
-  
-//   children.push(
-//     new Paragraph({
-//       text: `Representantes ${headerData.empresa}: ${headerData.participantesEmpresa}`,
-//       spacing: { after: 200 },
-//       indent: { left: 720 }
-//     })
-//   );
-  
-//   children.push(
-//     new Paragraph({
-//       text: `Representantes Contabilidade: ${headerData.participantesContabilidade}`,
-//       spacing: { after: 400 },
-//       indent: { left: 720 }
-//     })
-//   );
-
-//   // Linha horizontal para separar cabeçalho do conteúdo
-//   children.push(
-//     new Paragraph({
-//       text: "",
-//       border: {
-//         bottom: {
-//           color: "#000000",
-//           space: 1,
-//           style: BorderStyle.SINGLE,
-//           size: 6,
-//         },
-//       },
-//       spacing: { after: 400 },
-//     })
-//   );
-  
-//   // Processar cada seção com formatação consistente
-//   Object.entries(sections).forEach(([sectionName, section]) => {
-//     // Adicionar título da seção com formatação destacada
-//     children.push(
-//       new Paragraph({
-//         text: sectionName.toUpperCase(),
-//         heading: HeadingLevel.HEADING_2,
-//         spacing: { before: 400, after: 200 },
-//         border: {
-//           left: { style: BorderStyle.SINGLE, size: 16, color: "#666666" }
-//         },
-//         indent: { left: 360 }
-//       })
-//     );
-
-//     // Processar cada bloco com formatação consistente
-//     section.blocks.forEach((block) => {
-//       if (block.title) {
-//         children.push(
-//           new Paragraph({
-//             text: block.title,
-//             heading: HeadingLevel.HEADING_3,
-//             spacing: { before: 300, after: 100 },
-//             indent: { left: 360 }
-//           })
-//         );
-//       }
-      
-//       // Converter conteúdo HTML para elementos docx com melhor formatação
-//       if (block.content) {
-//         const contentParagraphs = convertHtmlToDocxElements(block.content);
-//         children.push(...contentParagraphs);
-//       }
-//     });
-//   });
-
-//   // Adicionar seção de assinaturas com melhor layout
-//   children.push(
-//     new Paragraph({
-//       text: "",
-//       spacing: { before: 800 }
-//     })
-//   );
-
-//   // Assinaturas lado a lado
-//   children.push(
-//     new Paragraph({
-//       children: [
-//         new TextRun({
-//           text: `_______________________              _______________________`,
-//           bold: true
-//         })
-//       ],
-//       alignment: AlignmentType.CENTER,
-//       spacing: { after: 200 }
-//     })
-//   );
-
-//   children.push(
-//     new Paragraph({
-//       children: [
-//         new TextRun({
-//           text: `${headerData.empresa}                           Contabilidade`,
-//           bold: true
-//         })
-//       ],
-//       alignment: AlignmentType.CENTER
-//     })
-//   );
-
-//   // Criar o documento com todas as seções
-//   const doc = new Document({
-//     creator: "Ata Multissetorial",
-//     title: "Ata de Reunião",
-//     description: "Relatório gerado automaticamente",
-//     sections: [{ 
-//       properties: {
-//         page: {
-//           margin: {
-//             top: 1440, // 1 inch
-//             right: 1440,
-//             bottom: 1440,
-//             left: 1440
-//           }
-//         }
-//       }, 
-//       children: children 
-//     }]
-//   });
-
-//   // Salvar documento
-//   const buffer = await Packer.toBuffer(doc);
-//   fs.writeFileSync(filename, buffer);
-//   console.log('Word gerado com sucesso', filename);
-// };
-
-// Função para gerar HTML a partir das seções
+// function para gerar HTML a partir das seções
 const generateHTML = (sections, headerData) => {
 
     // Se headerData não for um objeto, inicialize como objeto vazio para evitar impressões indesejadas
@@ -358,7 +113,7 @@ const generateHTML = (sections, headerData) => {
             font-family: 'Times New Roman', serif;
             font-size: 12pt;
             line-height: 1.5;
-            color: #333;
+            color: #212121;
             margin: 0;
             padding: 0;
           }
@@ -479,49 +234,50 @@ const generateHTML = (sections, headerData) => {
             <div class="title">Ata de Reunião</div>
             <table class="header-info">
               <tr>
-                <td>Empresa:</td>
+                <td>Empresa</td>
                 <td>${headerData.empresa || ''}</td>
               </tr>
               <tr>
-                <td>Local:</td>
+                <td>Local</td>
                 <td>${headerData.local || ''}</td>
               </tr>
               <tr>
-                <td>Data:</td>
+                <td>Data</td>
                 <td>${headerData.data || ''}</td>
               </tr>
               <tr>
-                <td>${headerData.empresa || ''}:</td>
+                <td>Representantes ${headerData.empresa || ''}</td>
                 <td>${headerData.participantesEmpresa || ''}</td>
               </tr>
-                <td>Canella & Santos:</td>
+                <td>Representantes Canella & Santos</td>
                 <td>${headerData.participantesContabilidade || ''}</td>
             </table>
           </div>
     `;
 
-    // Adiciona as seções ao HTML
+    // adiciona as seções ao HTML
     Object.entries(sections).forEach(([sectionName, section]) => {
+      // ignora se não for uma seção válida (fiscal, dp ou contabil)
+      if (!section.blocks || !Array.isArray(section.blocks)) return;
+    
       html += `
         <div class="section">
-          <div class="section-title">${sectionName.toUpperCase()}</div>
+          <div class="section-title">${sectionTitles[sectionName] || sectionName.toUpperCase()}</div>
       `;
-      if (section.blocks && Array.isArray(section.blocks)) {
-        section.blocks.forEach((block) => {
-          if (block.title || block.content) {
-            html += `
-              <div class="block">
-                ${block.title ? `<div class="block-title">${block.title}</div>` : ''}
-                ${block.content ? `<div class="block-content">${block.content}</div>` : ''}
-              </div>
-            `;
-          }
-        });
-      }
+      section.blocks.forEach((block) => {
+        if (block.title || block.content) {
+          html += `
+            <div class="block">
+              ${block.title ? `<div class="block-title">${block.title}</div>` : ''}
+              ${block.content ? `<div class="block-content">${block.content}</div>` : ''}
+            </div>
+          `;
+        }
+      });
       html += `</div>`;
     });
 
-    // Seção de assinaturas (opcional, se necessário)
+    // seção de assinaturas (opcional, se necessário)
     html += ` `;
     return html;
 };
@@ -538,7 +294,7 @@ app.get('/data/:formId', (req, res) => {
   }
 });
 
-// Lista formulários abertos
+// lista formulários abertos
 app.get('/forms', (req, res) => {
   try {
     const data = readAllData();
@@ -553,7 +309,7 @@ app.get('/forms', (req, res) => {
   }
 });
 
-// Cria um novo formulário
+// cria um novo formulário
 app.post('/createForm', (req, res) => {
   try {
     let data = readAllData();
@@ -572,7 +328,7 @@ app.post('/createForm', (req, res) => {
   }
 });
 
-// Atualizar dados de um formulário
+// atualizar dados de um formulário
 app.post('/update/:formId', (req, res) => {
   const { formId } = req.params;
   const { sections, headerData } = req.body;
@@ -594,25 +350,7 @@ app.post('/update/:formId', (req, res) => {
   }
 });
 
-// Resetar um formulário específico
-app.post('/reset/:formId', (req, res) => {
-  try {
-    const { formId } = req.params;
-    const initialData = {
-      fiscal: { blocks: [{ title: '', content: '' }], completed: false },
-      dp: { blocks: [{ title: '', content: '' }], completed: false },
-      contabil: { blocks: [{ title: '', content: '' }], completed: false },
-      headerData: {}
-    };
-    saveFormData(formId, initialData);
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Erro ao resetar os dados:', error);
-    res.status(500).json({ error: 'Erro ao resetar os dados.' });
-  }
-});
-
-// Gerar documentos (PDF e Word) e depois deletar o formulário
+// gerar documentos (PDF e Word) e depois deletar o formulário
 app.post('/generate/:formId', async (req, res) => {
   const { formId } = req.params;
   const { sections, headerData } = req.body;
@@ -643,7 +381,7 @@ app.post('/generate/:formId', async (req, res) => {
     // zip.addLocalFile(wordPath);
     zip.writeZip(zipPath);
     res.json({ filename: id });
-    // Após a geração, remove o formulário
+    // após a geração, remove o formulário
     deleteFormData(formId);
   } catch (error) {
     console.error('Erro ao gerar documentos:', error);
@@ -651,7 +389,7 @@ app.post('/generate/:formId', async (req, res) => {
   }
 });
 
-// Download do arquivo ZIP gerado
+// download do arquivo ZIP gerado
 app.get('/download/:filename', (req, res) => {
   const { filename } = req.params;
   const filePath = path.resolve(`./temp/${filename}.zip`);

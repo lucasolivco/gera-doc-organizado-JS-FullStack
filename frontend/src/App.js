@@ -3,7 +3,7 @@ import { Container, Card, Button, Form, Row, Col, Modal, ListGroup } from 'react
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { FaSun, FaMoon, FaTimes } from 'react-icons/fa'; //  ícones de dark e light mode
+import { FaSun, FaMoon, FaPlus, FaTrash, FaCheck, FaEdit, FaArrowLeft } from 'react-icons/fa'; //  ícones de dark e light mode
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'; //  estilos do editor
 
@@ -108,7 +108,7 @@ useEffect(() => {
       })
       .finally(() => setLoading(false));
   } else if (formId === 'new') {
-    // Criar novo formulário e obter o formId
+    // criar novo formulário e obter o formId
     axios.post('http://localhost:3001/createForm')
       .then(response => {
         setFormId(response.data.formId);
@@ -148,7 +148,7 @@ useEffect(() => {
     }
   };
 
-  // Finaliza uma seção
+  // finaliza uma seção
   const completeSection = async (section) => {
     const updatedSections = {
       ...sections,
@@ -172,7 +172,7 @@ useEffect(() => {
     }
   };
 
-  // Adiciona um novo bloco
+  // adiciona um novo bloco
   const addBlock = async (section) => {
     const updatedSections = {
       ...sections,
@@ -217,38 +217,6 @@ useEffect(() => {
     setShowDeleteModal(false); //  fecha o modal
   };
 
-  //  verifica se todas as seções estão finalizadas
-  // const allCompleted = sections && Object.values(sections).every(s => s.completed);
-
-  // //  função para resetar o formulário
-  // const resetForm = async () => {
-  //   try {
-  //     // 1. Reseta o backend primeiro
-  //     await axios.post('http://localhost:3001/reset');
-  
-  //     // 2. Atualiza o estado local com os dados resetados
-  //     const initialData = {
-  //       fiscal: { blocks: [{ title: '', content: '' }], completed: false },
-  //       dp: { blocks: [{ title: '', content: '' }], completed: false },
-  //       contabil: { blocks: [{ title: '', content: '' }], completed: false },
-  //     };
-
-  //     setSections(initialData);
-  
-  //     // 3. Reseta os campos do cabeçalho
-  //     setHeaderData({
-  //       empresa: '',
-  //       local: '',
-  //       data: '',
-  //       participantesEmpresa: '',
-  //       participantesContabilidade: 'Eli, Cataryna e William',
-  //     });
-  //   } catch (error) {
-  //     console.error('Erro ao resetar o formulário:', error);
-  //     alert('Erro ao resetar o formulário!');
-  //   }
-  // };
-
   const generateDocuments = async () => {
     try {
       setDownloadLoading(true);
@@ -288,6 +256,16 @@ useEffect(() => {
       <button onClick={toggleDarkMode} className="dark-mode-toggle">
         {darkMode ? <FaSun size={24} /> : <FaMoon size={24} />}
       </button>
+
+      {/* Botão de voltar - adicione isso no início do return principal */}
+      <Button 
+        variant="outline-secondary" 
+        onClick={() => setFormId(null)}
+        className="custom-button back-button"
+        style={{ background: 'transparent', border: 'none' }}
+      >
+        <FaArrowLeft size={20} />
+      </Button>
 
       <Container className="my-5">
         <h1 className="form-title">Ata Multissetorial</h1>
@@ -468,7 +446,7 @@ const formats = [
   'align',
 ];
 
-// Componente de seção reutilizável
+// componente de seção reutilizável
 const Section = ({ title, section, onAddBlock, onComplete, onReopen, onUpdate, onDelete }) => {
   if (!section) {
     return <div>Erro: Seção não está definida.</div>;
@@ -480,11 +458,11 @@ const Section = ({ title, section, onAddBlock, onComplete, onReopen, onUpdate, o
         <h3>{title}</h3>
         {!section.completed ? (
           <Button className="custom-button btn-primary" onClick={onAddBlock}>
-            Adicionar Bloco
+            <FaPlus />
           </Button>
         ) : (
           <Button className="custom-button btn-warning" onClick={onReopen}>
-            Editar Seção
+            <FaEdit />
           </Button>
         )}
       </Card.Header>
@@ -512,15 +490,15 @@ const Section = ({ title, section, onAddBlock, onComplete, onReopen, onUpdate, o
               />
             </Col>
             <Col md={2} className="custom-col">
-              <Button className="custom-button btn-danger" onClick={() => onDelete(index)}>
-                Excluir Bloco
-              </Button>
+            <Button className="custom-button btn-danger" onClick={() => onDelete(index)}>
+              <FaTrash />
+            </Button>
             </Col>
           </Row>
         ))}
         {!section.completed && (
           <Button className="custom-button btn-outline-success" onClick={onComplete}>
-            Finalizar Seção
+            <FaCheck />
           </Button>
         )}
       </Card.Body>

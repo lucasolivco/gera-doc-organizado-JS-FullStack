@@ -371,3 +371,42 @@ body {
   color: white !important;
 }
 
+/* Botão de voltar */
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  padding: 10px 15px;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  color: var(--text-color);
+}
+
+/* Ajustes nos ícones dos botões */
+.custom-button svg {
+  margin-right: 0;
+  transition: transform 0.2s ease;
+}
+
+.custom-button:hover svg {
+  transform: scale(1.1);
+}
+
+/* Tamanho consistente para ícones */
+.btn-danger.custom-button svg,
+.btn-success.custom-button svg,
+.btn-warning.custom-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+
