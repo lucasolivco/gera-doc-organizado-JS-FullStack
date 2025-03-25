@@ -1,0 +1,35 @@
+{
+  "fiscal": {
+    "blocks": [
+      {
+        "title": "Pauta 1",
+        "content": "<p>Foi realizada a análise dos resultados financeiros do último trimestre, destacando os seguintes pontos principais:</p><p>&nbsp;</p><p>1. Receita total apresentou um crescimento de 15% em relação ao trimestre anterior.</p><ul><li>etctrecteetete</li><li>etctrecteetete</li></ul><p>&nbsp;</p><p>2. As despesas operacionais permaneceram dentro do orçamento estipulado.</p><ul><li>kkkkkfkdfkdfk</li></ul><p>3. O lucro líquido foi impactado positivamente pelos novos contratos firmados com empresas parceiras.</p><ul><li>ndwaodnalorem odwpnm dowkod</li></ul><p>4. Necessidade de revisão das projeções financeiras para o próximo semestre.</p><p>&nbsp;</p><p>Deliberação:</p><p>Será agendada uma reunião específica no início do próximo mês para revisar o planejamento financeiro estratégico da empresa.</p>"
+      }
+    ],
+    "completed": true
+  },
+  "dp": {
+    "blocks": [],
+    "completed": true
+  },
+  "contabil": {
+    "blocks": [
+      {
+        "title": "pauta 1",
+        "content": "<p>Foi realizada a análise dos resultados financeiros do último trimestre, destacando os seguintes pontos principais:</p><p>&nbsp;</p><p>1. Receita total apresentou um crescimento de 15% em relação ao trimestre anterior.</p><ul><li>etctrecteetete</li><li>etctrecteetete</li></ul><p>&nbsp;</p><p>2. As despesas operacionais permaneceram dentro do orçamento estipulado.</p><ul><li>kkkkkfkdfkdfk</li></ul><p>3. O lucro líquido foi impactado positivamente pelos novos contratos firmados com empresas parceiras.</p><ul><li>ndwaodnalorem odwpnm dowkod</li></ul><p>4. Necessidade de revisão das projeções financeiras para o próximo semestre.</p><p>&nbsp;</p><p>Deliberação:</p><p>Será agendada uma reunião específica no início do próximo mês para revisar o planejamento financeiro estratégico da empresa.</p>"
+      },
+      {
+        "title": "Pauta 2",
+        "content": "<p>Foi realizada a análise dos resultados financeiros do último trimestre, destacando os seguintes pontos principais:</p><p>&nbsp;</p><p>1. Receita total apresentou um crescimento de 15% em relação ao trimestre anterior.</p><ul><li>etctrecteetete</li><li>etctrecteetete</li></ul><p>&nbsp;</p><p>2. As despesas operacionais permaneceram dentro do orçamento estipulado.</p><ul><li>kkkkkfkdfkdfk</li></ul><p>3. O lucro líquido foi impactado positivamente pelos novos contratos firmados com empresas parceiras.</p><ul><li>ndwaodnalorem odwpnm dowkod</li></ul><p>4. Necessidade de revisão das projeções financeiras para o próximo semestre.</p><p>&nbsp;</p><p>Deliberação:</p><p>Será agendada uma reunião específica no início do próximo mês para revisar o planejamento financeiro estratégico da empresa.</p>"
+      }
+    ],
+    "completed": true
+  },
+  "headerData": {
+    "empresa": "RedBull (exemplo)",
+    "local": "Canella & Santos, Volta Redonda-RJ",
+    "data": "2025-03-25",
+    "participantesEmpresa": "Max Verstappen",
+    "participantesContabilidade": "Eli, Cataryna e William"
+  }
+}

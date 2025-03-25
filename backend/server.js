@@ -10,30 +10,59 @@ const app = express(); // cria uma instância do express
 app.use(cors()); // habilita o middleware cors
 app.use(express.json()); // habilita o parsing do JSON, para receber dados no formato JSON
 
-const dataFilePath = path.resolve(__dirname, 'data.json');
+// Modificar a estrutura de armazenamento
+const formListFilePath = path.resolve(__dirname, 'formList.json');
+const formsDirectory = path.resolve(__dirname, 'forms');
 
-const readAllData = () => {
-  if (!fs.existsSync(dataFilePath)) {
-    fs.writeFileSync(dataFilePath, JSON.stringify({}));
+// Garantir que os diretórios existam
+try {
+  if (!fs.existsSync(formsDirectory)) {
+    fs.mkdirSync(formsDirectory, { recursive: true });
+    console.log(`Diretório de formulários criado em: ${formsDirectory}`);
   }
-  const data = fs.readFileSync(dataFilePath, 'utf-8');
-  return JSON.parse(data);
+  
+  // Verificar também se o arquivo de lista existe
+  if (!fs.existsSync(formListFilePath)) {
+    fs.writeFileSync(formListFilePath, JSON.stringify([]));
+    console.log(`Arquivo de lista de formulários criado em: ${formListFilePath}`);
+  }
+} catch (error) {
+  console.error('Erro ao criar diretórios ou arquivos necessários:', error);
+}
+
+// Função para ler a lista de formulários
+const readFormList = () => {
+  try {
+    // Verificar se o arquivo existe
+    if (!fs.existsSync(formListFilePath)) {
+      fs.writeFileSync(formListFilePath, JSON.stringify([]));
+      return [];
+    }
+    
+    // Ler o conteúdo do arquivo
+    const data = fs.readFileSync(formListFilePath, 'utf-8');
+    
+    // Verificar se o conteúdo está vazio ou em branco
+    if (!data || data.trim() === '') {
+      // Se estiver vazio, inicialize com um array vazio
+      fs.writeFileSync(formListFilePath, JSON.stringify([]));
+      return [];
+    }
+    
+    // Tente fazer o parse do JSON
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Erro ao ler lista de formulários:', error);
+    
+    // Em caso de erro, recrie o arquivo com um array vazio
+    fs.writeFileSync(formListFilePath, JSON.stringify([]));
+    return [];
+  }
 };
 
-// Função para ler dados de um formulário específico
-const readFormData = (formId) => {
-  const data = readAllData();
-  if (!data[formId]) {
-    // Inicializa o formulário se não existir
-    data[formId] = {
-      fiscal: { blocks: [{}], completed: false },
-      dp: { blocks: [{}], completed: false },
-      contabil: { blocks: [{}], completed: false },
-      headerData: {}
-    };
-    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-  }
-  return data[formId];
+// Função para salvar a lista de formulários
+const saveFormList = (formList) => {
+  fs.writeFileSync(formListFilePath, JSON.stringify(formList, null, 2));
 };
 
 const sectionTitles = {
@@ -42,11 +71,54 @@ const sectionTitles = {
   contabil: 'Departamento Contábil'
 };
 
+// Função para ler dados de um formulário específico
+const readFormData = (formId) => {
+  const formFilePath = path.resolve(formsDirectory, `${formId}.json`);
+  
+  if (!fs.existsSync(formFilePath)) {
+    // Inicializa o formulário com um objeto padrão se não existir
+    const defaultFormData = {
+      fiscal: { blocks: [{}], completed: false },
+      dp: { blocks: [{}], completed: false },
+      contabil: { blocks: [{}], completed: false },
+      headerData: {
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
+      }
+    };
+    
+    fs.writeFileSync(formFilePath, JSON.stringify(defaultFormData, null, 2));
+    return JSON.parse(JSON.stringify(defaultFormData)); // Clone profundo para evitar referências
+  }
+  
+  try {
+    const data = fs.readFileSync(formFilePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error(`Erro ao ler arquivo ${formId}.json:`, error);
+    // Em caso de erro, retorne um objeto padrão novo
+    return {
+      fiscal: { blocks: [{}], completed: false },
+      dp: { blocks: [{}], completed: false },
+      contabil: { blocks: [{}], completed: false },
+      headerData: {
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
+      }
+    };
+  }
+};
+
 // Função para salvar dados de um formulário específico
 const saveFormData = (formId, formData) => {
-  let data = readAllData();
-  data[formId] = formData;
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+  const formFilePath = path.resolve(formsDirectory, `${formId}.json`);
+  fs.writeFileSync(formFilePath, JSON.stringify(formData, null, 2));
 };
 
 // function para gerar PDF
@@ -344,15 +416,11 @@ app.get('/data/:formId', (req, res) => {
 });
 
 // lista formulários abertos
+// Modificar a rota para listar formulários
 app.get('/forms', (req, res) => {
   try {
-    const data = readAllData();
-    const formsList = Object.keys(data).map(formId => ({
-      id: formId,
-      title: data[formId].headerData?.empresa || 'Formulário sem título',
-      date: data[formId].headerData?.data || 'Sem data'
-    }));
-    res.json(formsList);
+    const formList = readFormList();
+    res.json(formList);
   } catch (error) {
     console.error('Erro ao listar os formulários:', error);
     res.status(500).json({ error: 'Erro ao listar os formulários.' });
@@ -362,17 +430,33 @@ app.get('/forms', (req, res) => {
 // cria um novo formulário
 app.post('/createForm', (req, res) => {
   try {
-    let data = readAllData();
     const id = uuidv4();
-    data[id] = {
+    const defaultFormData = {
       fiscal: { blocks: [{}], completed: false },
       dp: { blocks: [{}], completed: false },
       contabil: { blocks: [{}], completed: false },
       headerData: {
-        participantesContabilidade: 'Eli, Cataryna e William'
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
       }
     };
-    fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
+    
+    // Salvar os dados do formulário
+    const formFilePath = path.resolve(formsDirectory, `${id}.json`);
+    fs.writeFileSync(formFilePath, JSON.stringify(defaultFormData, null, 2));
+    
+    // Adicionar à lista de formulários
+    const formList = readFormList();
+    formList.push({
+      id,
+      title: 'Novo Formulário',
+      date: ''
+    });
+    saveFormList(formList);
+    
     res.json({ formId: id });
   } catch (error) {
     console.error('Erro ao criar o formulário:', error);
@@ -384,24 +468,53 @@ app.post('/createForm', (req, res) => {
 app.post('/update/:formId', (req, res) => {
   const { formId } = req.params;
   const { sections, headerData } = req.body;
+  
   if (!sections || typeof sections !== 'object') {
     return res.status(400).json({ error: 'Dados inválidos' });
   }
+  
   try {
-    const formData = readFormData(formId);
-    // Atualiza apenas as seções e, se enviado, o headerData
-    formData.fiscal = sections.fiscal;
-    formData.dp = sections.dp;
-    formData.contabil = sections.contabil;
-    if (headerData) formData.headerData = headerData;
+    // Criar um novo objeto para o formulário em vez de modificar o existente
+    const formData = {
+      fiscal: JSON.parse(JSON.stringify(sections.fiscal)),
+      dp: JSON.parse(JSON.stringify(sections.dp)),
+      contabil: JSON.parse(JSON.stringify(sections.contabil))
+    };
+    
+    // Adicionar headerData se fornecido
+    if (headerData) {
+      formData.headerData = JSON.parse(JSON.stringify(headerData));
+      
+      // Atualizar o título na lista de formulários
+      const formList = readFormList();
+      const formIndex = formList.findIndex(f => f.id === formId);
+      
+      if (formIndex !== -1) {
+        formList[formIndex].title = headerData.empresa || 'Formulário sem título';
+        formList[formIndex].date = headerData.data || '';
+        saveFormList(formList);
+      }
+    } else {
+      // Se headerData não foi fornecido, obtenha do arquivo existente
+      const existingData = readFormData(formId);
+      formData.headerData = existingData.headerData || {
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
+      };
+    }
+    
+    // Salvar os dados atualizados como um novo objeto
     saveFormData(formId, formData);
+    
     res.json({ success: true });
   } catch (error) {
     console.error('Erro ao salvar os dados:', error);
     res.status(500).json({ error: 'Erro ao salvar os dados.' });
   }
 });
-
 // gerar documentos (PDF e Word) e depois deletar o formulário
 app.post('/generate/:formId', async (req, res) => {
   const { formId } = req.params;
@@ -458,20 +571,55 @@ app.get('/download/:filename', (req, res) => {
 app.delete('/form/:formId', (req, res) => {
   try {
     const { formId } = req.params;
-    if (!fs.existsSync(dataFilePath)) {
-      return res.status(404).json({ error: 'Dados não encontrados.' });
+    console.log(`Recebida solicitação para excluir formulário: ${formId}`);
+    
+    if (!formId) {
+      console.error('ID do formulário não fornecido');
+      return res.status(400).json({ error: 'ID do formulário não fornecido' });
     }
-    const data = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
-    if (data[formId]) {
-      delete data[formId];
-      fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-      res.json({ success: true });
+    
+    const formFilePath = path.resolve(formsDirectory, `${formId}.json`);
+    console.log(`Caminho do arquivo a ser excluído: ${formFilePath}`);
+    
+    if (fs.existsSync(formFilePath)) {
+      console.log('Arquivo do formulário encontrado, procedendo com a exclusão');
+      
+      try {
+        // Remover o arquivo JSON do formulário
+        fs.unlinkSync(formFilePath);
+        console.log('Arquivo do formulário excluído com sucesso');
+      } catch (fileError) {
+        console.error('Erro ao excluir arquivo:', fileError);
+        return res.status(500).json({ error: 'Erro ao excluir arquivo do formulário' });
+      }
+      
+      try {
+        // Remover da lista de formulários
+        const formList = readFormList();
+        console.log(`Lista de formulários antes da exclusão: ${formList.length} formulários`);
+        
+        const updatedList = formList.filter(form => form.id !== formId);
+        console.log(`Lista de formulários após filtro: ${updatedList.length} formulários`);
+        
+        saveFormList(updatedList);
+        console.log('Lista de formulários atualizada salva');
+      } catch (listError) {
+        console.error('Erro ao atualizar lista de formulários:', listError);
+        // Mesmo com erro na lista, o arquivo foi excluído, então consideramos parcialmente bem-sucedido
+        return res.status(207).json({ 
+          warning: 'Formulário excluído, mas houve erro ao atualizar a lista',
+          error: listError.message
+        });
+      }
+      
+      return res.json({ success: true });
     } else {
-      res.status(404).json({ error: 'Formulário não encontrado.' });
+      console.log('Arquivo do formulário não encontrado');
+      return res.status(404).json({ error: 'Formulário não encontrado.' });
     }
   } catch (error) {
     console.error('Erro ao deletar o formulário:', error);
-    res.status(500).json({ error: 'Erro ao deletar o formulário.' });
+    return res.status(500).json({ error: 'Erro ao deletar o formulário.' });
   }
 });
 

@@ -35,16 +35,36 @@ const FormSelection = ({ onSelectForm}) => {
     loadForms();
   }, []);
 
-    // Função para deletar um formulário
-    const deleteForm = (formId) => {
-      axios.delete(`${API_URL}/form/${formId}`)
-        .then(() => {
-          // Após a exclusão, recarregue a lista de formulários
-          loadForms();
-        })
-        .catch(error => {
-          console.error('Erro ao deletar o formulário:', error);
-        });
+  // Função para deletar um formulário
+  const deleteForm = (formId) => {
+    console.log(`Tentando excluir formulário com ID: ${formId}`);
+    
+    if (!formId) {
+      console.error('ID do formulário não fornecido para exclusão');
+      return;
+    }
+    
+    // Garantir que a URL esteja correta
+    const deleteUrl = `${API_URL}/form/${formId}`;
+    console.log(`URL de exclusão: ${deleteUrl}`);
+    
+    axios.delete(deleteUrl)
+      .then(response => {
+        console.log('Resposta do servidor após exclusão:', response.data);
+        alert('Formulário excluído com sucesso!');
+        // Após a exclusão, recarregue a lista de formulários
+        loadForms();
+      })
+      .catch(error => {
+        console.error('Erro ao deletar o formulário:', error);
+        alert(`Erro ao excluir o formulário: ${error.message}`);
+      });
+  };
+
+      // Função para resetar o estado antes de selecionar um formulário
+    const handleSelectForm = (id) => {
+      // Chama a função passada pelo componente pai, que selecionará o formulário
+      onSelectForm(id);
     };
 
     return (
@@ -65,7 +85,7 @@ const FormSelection = ({ onSelectForm}) => {
               <div>
                 <Button 
                   variant="outline-primary" 
-                  onClick={() => onSelectForm(form.id)}
+                  onClick={() => handleSelectForm(form.id)}
                   className="custom-button px-3 py-1 me-2"
                 >
                   Abrir
@@ -86,19 +106,18 @@ const FormSelection = ({ onSelectForm}) => {
         </ListGroup>
         <Button 
           variant="success" 
-          onClick={() => onSelectForm('new')} 
+          onClick={() => handleSelectForm('new')} 
           className="custom-button d-block mx-auto px-4 py-2"
         >
           Criar Novo Formulário
         </Button>
-
-         {/* Modal de Confirmação de Exclusão */}
+        {/* Modal de Confirmação de Exclusão */}
         <Modal show={showDeleteFormModal} onHide={() => setShowDeleteFormModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Confirmar Exclusão</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Tem certeza que deseja excluir este formulário?
+            Tem certeza que deseja excluir este formulário? Esta ação não pode ser desfeita.
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowDeleteFormModal(false)}>
@@ -143,46 +162,120 @@ function App() {
 
   //  function para atualizar os campos do cabeçalho
   const updateHeaderField = (field, value) => {
-    const newHeaderData = { ...headerData, [field]: value };
+    // Clone profundo para evitar referências compartilhadas
+    const newHeaderData = JSON.parse(JSON.stringify({...headerData, [field]: value}));
     setHeaderData(newHeaderData);
-    if (formId) {
-      axios.post(`${API_URL}/update/${formId}`, { sections, headerData: newHeaderData });
+    
+    if (formId && formId !== 'new') {
+      try {
+        // Clone profundo de sections também para evitar modificações indesejadas
+        const sectionsCopy = JSON.parse(JSON.stringify(sections));
+        
+        axios.post(`${API_URL}/update/${formId}`, { 
+          sections: sectionsCopy, 
+          headerData: newHeaderData 
+        });
+      } catch (error) {
+        console.error('Erro ao atualizar o cabeçalho:', error);
+      }
     }
   };
 
-// Carregar dados do formulário selecionado
-useEffect(() => {
-  if (formId && formId !== 'new') {
-    axios.get(`${API_URL}/data/${formId}`)
-      .then(response => {
-        setSections(response.data);
-        setHeaderData(response.data.headerData || headerData);
-      })
-      .catch(error => {
-        console.error('Erro ao carregar os dados:', error);
-        setSections({
-          fiscal: { blocks: [{}], completed: false },
-          dp: { blocks: [{}], completed: false },
-          contabil: { blocks: [{}], completed: false }
-        });
-      })
-      .finally(() => setLoading(false));
-  } else if (formId === 'new') {
-    // criar novo formulário e obter o formId
-    axios.post(`${API_URL}/createForm`)
-      .then(response => {
-        setFormId(response.data.formId);
-        // Inicializa com dados padrão
-        setSections({
-          fiscal: { blocks: [{}], completed: false },
-          dp: { blocks: [{}], completed: false },
-          contabil: { blocks: [{}], completed: false }
-        });
-      })
-      .catch(error => console.error('Erro ao criar novo formulário:', error))
-      .finally(() => setLoading(false));
-  }
-}, [formId]);
+  // modificação no useEffect para lidar com a seleção de formulário:
+  useEffect(() => {
+    if (!formId) {
+      // Nenhum formulário selecionado, resetar o estado
+      setSections(null);
+      setHeaderData({
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
+      });
+      setLoading(false);
+      return;
+    }
+    
+    setLoading(true);
+    
+    if (formId === 'new') {
+      // Resetar o estado antes de criar um novo formulário
+      setSections(null);
+      setHeaderData({
+        empresa: '',
+        local: '',
+        data: '',
+        participantesEmpresa: '',
+        participantesContabilidade: 'Eli, Cataryna e William',
+      });
+      
+      // Criar novo formulário
+      axios.post(`${API_URL}/createForm`)
+        .then(response => {
+          const newFormId = response.data.formId;
+          
+          // IMPORTANTE: Agora vamos carregar explicitamente os dados do servidor
+          // para garantir que não tenhamos dados desatualizados no frontend
+          return axios.get(`${API_URL}/data/${newFormId}`)
+            .then(dataResponse => {
+              // Definir o formId só depois de carregar os dados
+              setFormId(newFormId);
+              
+              // Usar os dados retornados do servidor, não dados locais
+              const data = dataResponse.data;
+              
+              setSections({
+                fiscal: data.fiscal || { blocks: [{}], completed: false },
+                dp: data.dp || { blocks: [{}], completed: false },
+                contabil: data.contabil || { blocks: [{}], completed: false }
+              });
+              
+              setHeaderData(data.headerData || {
+                empresa: '',
+                local: '',
+                data: '',
+                participantesEmpresa: '',
+                participantesContabilidade: 'Eli, Cataryna e William',
+              });
+            });
+        })
+        .catch(error => {
+          console.error('Erro ao criar/carregar novo formulário:', error);
+          setFormId(null); // Voltar para a tela de seleção em caso de erro
+        })
+        .finally(() => setLoading(false));
+    } else {
+      // Carregar formulário existente
+      axios.get(`${API_URL}/data/${formId}`)
+        .then(response => {
+          // Garantir que estamos recebendo dados válidos
+          const data = response.data || {};
+          
+          // Usar clones JSON para evitar referências compartilhadas
+          const newSections = {
+            fiscal: JSON.parse(JSON.stringify(data.fiscal || { blocks: [{}], completed: false })),
+            dp: JSON.parse(JSON.stringify(data.dp || { blocks: [{}], completed: false })),
+            contabil: JSON.parse(JSON.stringify(data.contabil || { blocks: [{}], completed: false }))
+          };
+          
+          setSections(newSections);
+          
+          setHeaderData(JSON.parse(JSON.stringify(data.headerData || {
+            empresa: '',
+            local: '',
+            data: '',
+            participantesEmpresa: '',
+            participantesContabilidade: 'Eli, Cataryna e William',
+          })));
+        })
+        .catch(error => {
+          console.error('Erro ao carregar os dados:', error);
+          setFormId(null); // Voltar para a tela de seleção em caso de erro
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [formId]);
 
   //  function para alternar modo claro e escuro
   const toggleDarkMode = () => {
@@ -196,15 +289,25 @@ useEffect(() => {
 
   //  function para atualizar o conteúdo de um bloco
   const updateBlock = async (section, index, field, value) => {
-    const updatedBlocks = [...sections[section].blocks];
+    if (!formId || formId === 'new') return; // Não atualize se não houver formulário válido selecionado
+    
+    // Clone profundo dos blocos para evitar modificações indesejadas
+    const updatedBlocks = JSON.parse(JSON.stringify(sections[section].blocks));
     updatedBlocks[index][field] = value;
-    const updatedSections = {
-      ...sections,
-      [section]: { ...sections[section], blocks: updatedBlocks }
-    };
+    
+    // Clone profundo de todas as seções para evitar efeitos colaterais
+    const updatedSections = JSON.parse(JSON.stringify(sections));
+    updatedSections[section].blocks = updatedBlocks;
+    
     setSections(updatedSections);
-    if (formId) {
-      await axios.post(`${API_URL}/update/${formId}`, { sections: updatedSections, headerData });
+    
+    try {
+      await axios.post(`${API_URL}/update/${formId}`, { 
+        sections: updatedSections, 
+        headerData: JSON.parse(JSON.stringify(headerData)) // Clone também os dados do cabeçalho
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar o bloco:', error);
     }
   };
 

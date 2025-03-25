@@ -1,0 +1,27 @@
+{
+  "fiscal": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "dp": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "contabil": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "headerData": {
+    "empresa": "",
+    "local": "",
+    "data": "",
+    "participantesEmpresa": "",
+    "participantesContabilidade": "Eli, Cataryna e William"
+  }
+}

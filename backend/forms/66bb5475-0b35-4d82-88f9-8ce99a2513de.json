@@ -1,0 +1,30 @@
+{
+  "fiscal": {
+    "blocks": [
+      {
+        "title": "teste",
+        "content": "<p>teste</p>"
+      }
+    ],
+    "completed": true
+  },
+  "dp": {
+    "blocks": [
+      {}
+    ],
+    "completed": true
+  },
+  "contabil": {
+    "blocks": [
+      {}
+    ],
+    "completed": true
+  },
+  "headerData": {
+    "empresa": "teste",
+    "local": "teste",
+    "data": "2025-03-26",
+    "participantesEmpresa": "teste",
+    "participantesContabilidade": "Eli, Cataryna e William"
+  }
+}

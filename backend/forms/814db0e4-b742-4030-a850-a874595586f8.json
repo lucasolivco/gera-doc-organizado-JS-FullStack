@@ -1,0 +1,34 @@
+{
+  "fiscal": {
+    "blocks": [
+      {
+        "title": "Pauta 1 - Documentação",
+        "content": "<ul><li><strong>Documentação: </strong>Desenvolver documentação completa de cada sessão da aplicação e o que for necessário.</li><li>A documentação será dividida em três categorias principais:</li><li class=\"ql-indent-1\"><strong>Documentação Técnica</strong>: Detalhes sobre arquitetura, tecnologias, APIs e banco de dados.</li><li class=\"ql-indent-1\"><strong>Documentação de Segurança e Processos</strong>: Procedimentos de segurança e controle de acessos.</li><li class=\"ql-indent-1\"><strong>Documentação do Usuário</strong>: Guia de uso e funcionalidades do sistema.</li><li class=\"ql-align-justify\"><strong>Documentação Técnica</strong></li><li class=\"ql-align-justify ql-indent-1\">Arquitetura do Sistema</li><li class=\"ql-align-justify ql-indent-1\">Banco de Dados</li><li class=\"ql-align-justify ql-indent-1\">APIs e Requisições</li><li class=\"ql-align-justify ql-indent-1\">Login e Autenticação</li><li class=\"ql-align-justify\"><strong>Documentação do Usuário</strong></li><li class=\"ql-align-justify ql-indent-1\">Cadastro e Login</li><li class=\"ql-align-justify ql-indent-1\">Interface e Navegação</li><li class=\"ql-align-justify ql-indent-1\">Funcionalidades Disponíveis</li><li class=\"ql-align-justify\"><strong>Documentação de Segurança e Processos</strong></li><li class=\"ql-align-justify ql-indent-1\">Segurança do Sistema</li><li class=\"ql-align-justify ql-indent-1\">Controle de Acessos</li><li class=\"ql-align-justify ql-indent-1\">Procedimentos de Manutenção</li></ul><p><br></p>"
+      },
+      {
+        "title": "Pauta 2 - Testes",
+        "content": "<p>·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Testes de Funcionalidade: </strong>Testes unitários e de integração para validar cada funcionalidade. Simular uso por diferentes tipos de usuários, correção de bugs e melhorias antes da implantação.</p><p><strong>&nbsp;</strong></p><p>·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Testes de Segurança: </strong>Validar vulnerabilidades contra SQL Injection e XSS, realizar testes de autenticação e controle de acesso. Além de, avaliar criptografia e armazenamento seguro de senhas.</p><p><strong>&nbsp;</strong></p><p>·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Testes de Usabilidade:</strong> Realizar avaliação com usuários finais para verificar a experiência com a aplicação. Ajustes na interface e fluxos conforme feedbacks coletados. </p><p><strong>&nbsp;</strong></p><p>·&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Coleta de Feedbacks:</strong> Enviar formulários de avaliação para os usuários e implementar melhorias com base nos feedbacks recebidos. Também é necessário a análise de métricas de uso e identificação de pontos de melhoria.</p>"
+      }
+    ],
+    "completed": false
+  },
+  "dp": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "contabil": {
+    "blocks": [
+      {}
+    ],
+    "completed": false
+  },
+  "headerData": {
+    "empresa": "RedBull (Exemplo)",
+    "local": "Canella & Santos, Volta Redonda-RJ",
+    "data": "2025-03-25",
+    "participantesEmpresa": "Max Verstappen",
+    "participantesContabilidade": "Eli, Cataryna e William"
+  }
+}
